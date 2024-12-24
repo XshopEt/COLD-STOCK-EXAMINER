@@ -54,7 +54,6 @@
         <button onclick="processExcel()">Compare Stock</button>
         <div id="output"></div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         function processExcel() {
@@ -73,7 +72,6 @@
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
 
-                // Ensure two sheets exist
                 if (workbook.SheetNames.length < 2) {
                     alert('The file must contain at least two sheets for comparison.');
                     return;
@@ -82,10 +80,7 @@
                 const sheet1 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: 0 });
                 const sheet2 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]], { defval: 0 });
 
-                // Merge and compare data
                 const comparison = compareSheets(sheet1, sheet2);
-
-                // Generate output
                 outputDiv.innerHTML = generateTable(comparison);
             };
 
@@ -103,10 +98,10 @@
                     const unitsSold = stockWeek1 - stockWeek2;
                     const unitPrice = row1['unit price'] || 0;
                     const totalValue = unitsSold * unitPrice;
-                    const percentageSold = ((unitsSold / stockWeek1) * 100).toFixed(2) + '%';
+                    const percentageSold = stockWeek1 > 0 ? ((unitsSold / stockWeek1) * 100).toFixed(2) + '%' : '0%';
 
                     comparison.push({
-                        'Item': row1['Item'],
+                        'Item': row1['Item'] || 'undefined',
                         'Stock Week 1': stockWeek1,
                         'Stock Week 2': stockWeek2,
                         'Units Sold': unitsSold,
@@ -116,7 +111,6 @@
                     });
                 }
             });
-
             return comparison;
         }
 
