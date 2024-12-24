@@ -3,139 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel Stock Comparison Tool</title>
+    <title>Stock Comparison Results</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
+            background-color: #f9f9f9;
         }
         h1 {
             text-align: center;
+            color: #333;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
-        table th, table td {
+        th, td {
+            padding: 12px;
+            text-align: center;
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
         }
-        table th {
-            background-color: #f4f4f4;
-        }
-        .file-input {
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007BFF;
+        th {
+            background-color: #4CAF50;
             color: white;
-            border: none;
-            cursor: pointer;
         }
-        button:hover {
-            background-color: #0056b3;
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .category-fast-moving {
+            color: green;
+            font-weight: bold;
+        }
+        .category-medium-high {
+            color: orange;
+            font-weight: bold;
+        }
+        .category-medium-low {
+            color: brown;
+            font-weight: bold;
+        }
+        .category-cold-stock {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Excel Stock Comparison Tool</h1>
-        <div class="file-input">
-            <label for="excelFile">Upload Excel File:</label>
-            <input type="file" id="excelFile" accept=".xlsx, .xls">
-        </div>
-        <button onclick="processExcel()">Compare Stock</button>
-        <div id="output"></div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        function processExcel() {
-            const fileInput = document.getElementById('excelFile');
-            const outputDiv = document.getElementById('output');
-
-            if (!fileInput.files.length) {
-                alert('Please upload an Excel file.');
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-
-                if (workbook.SheetNames.length < 2) {
-                    alert('The file must contain at least two sheets for comparison.');
-                    return;
-                }
-
-                const sheet1 = XLSX.utils.sheet_to_json(workbook.Sheets['WEEK 44'], { defval: 0 });
-                const sheet2 = XLSX.utils.sheet_to_json(workbook.Sheets['WEEK 49'], { defval: 0 });
-
-                const comparison = compareSheets(sheet1, sheet2);
-                outputDiv.innerHTML = generateTable(comparison);
-            };
-
-            reader.readAsArrayBuffer(file);
-        }
-
-        function compareSheets(sheet1, sheet2) {
-            const comparison = [];
-
-            sheet1.forEach(row1 => {
-                const row2 = sheet2.find(row => row['Unnamed: 1'] === row1['Unnamed: 1']);
-                if (row2) {
-                    const stockWeek1 = parseFloat(row1['Unnamed: 7']) || 0;
-                    const stockWeek2 = parseFloat(row2['Unnamed: 7']) || 0;
-                    const unitsSold = stockWeek1 - stockWeek2;
-                    const unitPrice = parseFloat(row1['Unnamed: 8']) || 0;
-                    const totalValue = unitsSold * unitPrice;
-                    const percentageSold = stockWeek1 > 0 ? ((unitsSold / stockWeek1) * 100).toFixed(2) + '%' : '0%';
-
-                    comparison.push({
-                        'Item': row1['Unnamed: 1'] || 'undefined',
-                        'Stock Week 1': stockWeek1,
-                        'Stock Week 2': stockWeek2,
-                        'Units Sold': unitsSold,
-                        'Percentage Sold': percentageSold,
-                        'Unit Price': unitPrice.toFixed(2),
-                        'Total Value': totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })
-                    });
-                }
-            });
-            return comparison;
-        }
-
-        function generateTable(data) {
-            if (!data.length) return '<p>No matching data found between sheets.</p>';
-
-            let table = '<table><thead><tr>';
-            const headers = Object.keys(data[0]);
-            headers.forEach(header => {
-                table += `<th>${header}</th>`;
-            });
-            table += '</tr></thead><tbody>';
-
-            data.forEach(row => {
-                table += '<tr>';
-                headers.forEach(header => {
-                    table += `<td>${row[header]}</td>`;
-                });
-                table += '</tr>';
-            });
-
-            table += '</tbody></table>';
-            return table;
-        }
-    </script>
+    <h1>Stock Comparison Results</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Total Week 44</th>
+                <th>Total Week 49</th>
+                <th>Units Sold</th>
+                <th>Percentage Sold</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example rows: Replace these rows with data dynamically generated -->
+            <tr>
+                <td>1046/mouse pad 3 mm</td>
+                <td>406.0</td>
+                <td>0.0</td>
+                <td>406.0</td>
+                <td>100.00%</td>
+                <td>132.48</td>
+                <td>53786.88</td>
+                <td class="category-fast-moving">Fast Moving</td>
+            </tr>
+            <tr>
+                <td>1727/DTF POWDER</td>
+                <td>1.0</td>
+                <td>0.0</td>
+                <td>1.0</td>
+                <td>100.00%</td>
+                <td>3688.70</td>
+                <td>3688.70</td>
+                <td class="category-fast-moving">Fast Moving</td>
+            </tr>
+            <tr>
+                <td>1737/Rollup deluxe</td>
+                <td>85.0</td>
+                <td>2.0</td>
+                <td>83.0</td>
+                <td>97.65%</td>
+                <td>4441.65</td>
+                <td>368656.95</td>
+                <td class="category-fast-moving">Fast Moving</td>
+            </tr>
+            <tr>
+                <td>1695/Foam Board 3mm</td>
+                <td>86.0</td>
+                <td>8.0</td>
+                <td>78.0</td>
+                <td>90.70%</td>
+                <td>3500.00</td>
+                <td>273000.00</td>
+                <td class="category-fast-moving">Fast Moving</td>
+            </tr>
+            <tr>
+                <td>1161/Pillow Magic Cover</td>
+                <td>21.0</td>
+                <td>2.0</td>
+                <td>19.0</td>
+                <td>90.48%</td>
+                <td>281.75</td>
+                <td>5353.25</td>
+                <td class="category-fast-moving">Fast Moving</td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>
-
