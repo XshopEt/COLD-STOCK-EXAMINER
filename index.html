@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel Stock Comparison</title>
+    <title>Excel Stock Comparison Tool</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -77,8 +77,8 @@
                     return;
                 }
 
-                const sheet1 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: 0 });
-                const sheet2 = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[1]], { defval: 0 });
+                const sheet1 = XLSX.utils.sheet_to_json(workbook.Sheets['WEEK 44'], { defval: 0 });
+                const sheet2 = XLSX.utils.sheet_to_json(workbook.Sheets['WEEK 49'], { defval: 0 });
 
                 const comparison = compareSheets(sheet1, sheet2);
                 outputDiv.innerHTML = generateTable(comparison);
@@ -88,34 +88,26 @@
         }
 
         function compareSheets(sheet1, sheet2) {
-            const headers1 = Object.keys(sheet1[0]);
-            const headers2 = Object.keys(sheet2[0]);
-
-            const itemColumn1 = headers1.find(header => /item/i.test(header)) || 'Item';
-            const stockColumn1 = headers1.find(header => /stock/i.test(header)) || 'Stock';
-            const priceColumn1 = headers1.find(header => /price/i.test(header)) || 'unit price';
-
-            const stockColumn2 = headers2.find(header => /stock/i.test(header)) || 'Stock';
-
             const comparison = [];
+
             sheet1.forEach(row1 => {
-                const row2 = sheet2.find(row => row[itemColumn1] === row1[itemColumn1]);
+                const row2 = sheet2.find(row => row['Unnamed: 1'] === row1['Unnamed: 1']);
                 if (row2) {
-                    const stockWeek1 = row1[stockColumn1] || 0;
-                    const stockWeek2 = row2[stockColumn2] || 0;
+                    const stockWeek1 = parseFloat(row1['Unnamed: 7']) || 0;
+                    const stockWeek2 = parseFloat(row2['Unnamed: 7']) || 0;
                     const unitsSold = stockWeek1 - stockWeek2;
-                    const unitPrice = row1[priceColumn1] || 0;
+                    const unitPrice = parseFloat(row1['Unnamed: 8']) || 0;
                     const totalValue = unitsSold * unitPrice;
                     const percentageSold = stockWeek1 > 0 ? ((unitsSold / stockWeek1) * 100).toFixed(2) + '%' : '0%';
 
                     comparison.push({
-                        'Item': row1[itemColumn1] || 'undefined',
+                        'Item': row1['Unnamed: 1'] || 'undefined',
                         'Stock Week 1': stockWeek1,
                         'Stock Week 2': stockWeek2,
                         'Units Sold': unitsSold,
                         'Percentage Sold': percentageSold,
-                        'Unit Price': unitPrice,
-                        'Total Value': totalValue.toLocaleString()
+                        'Unit Price': unitPrice.toFixed(2),
+                        'Total Value': totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })
                     });
                 }
             });
