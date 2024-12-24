@@ -88,20 +88,28 @@
         }
 
         function compareSheets(sheet1, sheet2) {
-            const comparison = [];
+            const headers1 = Object.keys(sheet1[0]);
+            const headers2 = Object.keys(sheet2[0]);
 
+            const itemColumn1 = headers1.find(header => /item/i.test(header)) || 'Item';
+            const stockColumn1 = headers1.find(header => /stock/i.test(header)) || 'Stock';
+            const priceColumn1 = headers1.find(header => /price/i.test(header)) || 'unit price';
+
+            const stockColumn2 = headers2.find(header => /stock/i.test(header)) || 'Stock';
+
+            const comparison = [];
             sheet1.forEach(row1 => {
-                const row2 = sheet2.find(row => row['Item'] === row1['Item']);
+                const row2 = sheet2.find(row => row[itemColumn1] === row1[itemColumn1]);
                 if (row2) {
-                    const stockWeek1 = row1['Stock'] || 0;
-                    const stockWeek2 = row2['Stock'] || 0;
+                    const stockWeek1 = row1[stockColumn1] || 0;
+                    const stockWeek2 = row2[stockColumn2] || 0;
                     const unitsSold = stockWeek1 - stockWeek2;
-                    const unitPrice = row1['unit price'] || 0;
+                    const unitPrice = row1[priceColumn1] || 0;
                     const totalValue = unitsSold * unitPrice;
                     const percentageSold = stockWeek1 > 0 ? ((unitsSold / stockWeek1) * 100).toFixed(2) + '%' : '0%';
 
                     comparison.push({
-                        'Item': row1['Item'] || 'undefined',
+                        'Item': row1[itemColumn1] || 'undefined',
                         'Stock Week 1': stockWeek1,
                         'Stock Week 2': stockWeek2,
                         'Units Sold': unitsSold,
